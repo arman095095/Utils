@@ -1,13 +1,13 @@
 //
-//  ProfileValidator.swift
+//  File.swift
 //  
 //
-//  Created by Арман Чархчян on 13.04.2022.
+//  Created by Арман Чархчян on 12.04.2022.
 //
 
 import UIKit
 
-public protocol ProfileValidatorProtocol: AnyObject {
+public protocol ProfileValidatorProtocol {
     func validateSelectedAgeNoLess16(date: String) -> Bool
     func validateSelectedAge(with date: String) -> Bool
     func validateSelectedImage(userImage: UIImage) -> Bool
@@ -19,9 +19,61 @@ public protocol ProfileValidatorProtocol: AnyObject {
                          city: String) -> Bool
 }
 
-public final class ProfileValidator: ProfileValidatorProtocol {
+public protocol CredentionalValidatorProtocol {
+    func checkEmptyRegistration(email: String,
+                                password: String,
+                                confirmPassword: String) -> Bool
+    func checkEmptyLogin(email: String, password: String) -> Bool
+    func mailCorrectFormat(_ email: String) -> Bool
+    func passwordsMatches(password: String, confirmed: String) -> Bool
+}
+
+public struct FieldsValidator {
     
-    public enum Error: LocalizedError {
+    public init() { }
+
+}
+
+extension FieldsValidator: CredentionalValidatorProtocol {
+    public enum CredentionalError: LocalizedError {
+        case notFilled
+        case invalidEmail
+        case passwordsNotMatched
+        
+        public var errorDescription: String? {
+            switch self {
+            case .notFilled:
+                return NSLocalizedString("Заполните все поля", comment: "")
+            case .invalidEmail:
+                return NSLocalizedString("Формат почты не является допустимым", comment: "")
+            case .passwordsNotMatched:
+                return NSLocalizedString("Пароли не совпадают", comment: "")
+            }
+        }
+    }
+    
+    public func checkEmptyRegistration(email: String, password: String, confirmPassword: String) -> Bool {
+        return !(email == "" || password == "" || confirmPassword == "")
+    }
+    
+    public func checkEmptyLogin(email: String, password: String) -> Bool {
+        return !(email == "" || password == "")
+    }
+    
+    public func mailCorrectFormat(_ email: String) -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}"
+        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: email)
+    }
+    
+    public func passwordsMatches(password: String, confirmed: String) -> Bool {
+        return password == confirmed
+    }
+}
+
+extension FieldsValidator: ProfileValidatorProtocol {
+    
+    public enum ProfileError: LocalizedError {
         case notFilled
         case photoNotAdded
         case ageLess16
@@ -40,8 +92,6 @@ public final class ProfileValidator: ProfileValidatorProtocol {
             }
         }
     }
-    
-    public init() { }
     
     public func validateSelectedAgeNoLess16(date: String) -> Bool {
         guard let age = Int(DateFormatService().getAge(date: date)) else { return false }
