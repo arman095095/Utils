@@ -10,7 +10,6 @@ import UIKit
 public protocol ProfileValidatorProtocol {
     func validateSelectedAgeNoLess16(date: String) -> Bool
     func validateSelectedAge(with date: String) -> Bool
-    func validateSelectedImage(userImage: UIImage) -> Bool
     func checkFilledInfo(username: String,
                          info: String,
                          sex: String,
@@ -65,11 +64,6 @@ extension FieldsValidator: ProfileValidatorProtocol {
     public func validateSelectedAge(with date: String) -> Bool {
         guard let age = Int(DateFormatService().getAge(date: date)) else { return false }
         return !(age > 120 || age < 1)
-    }
-    
-    public func validateSelectedImage(userImage: UIImage) -> Bool {
-        let image = UIImage(named: "people")
-        return userImage != image
     }
     
     public func checkFilledInfo(username: String,
