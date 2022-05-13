@@ -16,7 +16,7 @@ protocol DateFormatServiceProtocol {
     func onlyWeek(from date: Date) -> String
     func getTimerString(timeInterval: TimeInterval) -> String
     func convertForLabel(from date: Date) -> String
-    func convertForActiveChat(from date: Date) -> String
+    func convertForActiveChat(from date: Date?) -> String
     func convertDate(from date: Date) -> String
     func getAge(date: String) -> String
     func getAge(date: Date) -> String
@@ -116,7 +116,8 @@ public struct DateFormatService: DateFormatServiceProtocol {
         }
     }
     
-    public func convertForActiveChat(from date: Date) -> String {
+    public func convertForActiveChat(from date: Date?) -> String {
+        guard let date = date else { return "" }
         let currentDate = getLocaleDate(date: Date())
         let messageDate = getLocaleDate(date: date)
         
